@@ -206,7 +206,7 @@ def create_posts(request):
 @api_view(['GET'])
 def artistpost_list(request, artist_id):
     posts = Post.objects.filter(artist_id=artist_id).order_by('-created_at')
-    print(posts,'artist posts')
+    # print(posts,'artist posts')
     serializer = postSerializer(posts, many=True)
     return Response({'data':serializer.data}, status=status.HTTP_200_OK)
 
@@ -382,17 +382,15 @@ def get_orders(request,artist_id):
 
 
 @api_view(['PATCH'])
-def editorder_status(request):
-    order_id = request.GET.get('order_id')
-    value = request.GET.get('value')
-    try:
+def editorder_status(request,order_id):
         order = Order.objects.get(id=order_id)
-        order.status = value
-        order.order_status.save()
-        serializer = orderSerializer(order)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    except:
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        serializer = orderSerializer(order,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            print(serializer.errors,"3333333333333333")
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PATCH'])

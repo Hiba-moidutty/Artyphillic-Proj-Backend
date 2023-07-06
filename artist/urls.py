@@ -29,7 +29,6 @@ urlpatterns = [
 
     path('orderpost/',views.order_post,name='orderpost'),
     path('getorders/<int:artist_id>',views.get_orders,name='getorders'),
-    path('editstatus/',views.editorder_status,name='editstatus'),
-    path('ordercancel/',views.order_cancel,name='ordercancel'),
+    path('editorderstatus/<int:order_id>',views.editorder_status,name='editorderstatus'),
     path('orderdetails/',views.order_details,name='orderdetails'),
 ]
