@@ -1,0 +1,457 @@
+openapi: 3.0.3
+info:
+  title: Django DRF Artyphilic
+  version: 0.0.0
+paths:
+  /adminlogin:
+    post:
+      operationId: adminlogin_create
+      tags:
+      - adminlogin
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /adminlogout:
+    get:
+      operationId: adminlogout_retrieve
+      tags:
+      - adminlogout
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/schema/:
+    get:
+      operationId: api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /artist_login:
+    post:
+      operationId: artist_login_create
+      tags:
+      - artist_login
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artist'
+          description: ''
+  /artistlist:
+    get:
+      operationId: artistlist_retrieve
+      tags:
+      - artistlist
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artist'
+          description: ''
+  /artistsignup:
+    post:
+      operationId: artistsignup_create
+      tags:
+      - artistsignup
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /block-unblock-user/{user_id}/:
+    patch:
+      operationId: block_unblock_user_partial_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - block-unblock-user
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /eventlist:
+    get:
+      operationId: eventlist_retrieve
+      tags:
+      - eventlist
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event'
+          description: ''
+  /login:
+    post:
+      operationId: login_create
+      tags:
+      - login
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+          description: ''
+  /signup:
+    post:
+      operationId: signup_create
+      tags:
+      - signup
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+          description: ''
+  /userlist:
+    get:
+      operationId: userlist_list
+      tags:
+      - userlist
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/user'
+          description: ''
+components:
+  schemas:
+    artist:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        artist_name:
+          type: string
+          maxLength: 100
+        username:
+          type: string
+          maxLength: 15
+        password:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          maxLength: 30
+        phone_number:
+          type: string
+          maxLength: 13
+        place:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_admin:
+          type: boolean
+        is_active:
+          type: boolean
+        is_superuser:
+          type: boolean
+        is_blocked:
+          type: boolean
+      required:
+      - artist_name
+      - created_at
+      - email
+      - id
+      - password
+      - phone_number
+      - place
+      - updated_at
+      - username
+    event:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_name:
+          type: string
+          maxLength: 100
+        event_date:
+          type: string
+          format: date
+        event_place:
+          type: string
+          maxLength: 100
+        event_start_time:
+          type: string
+          format: time
+        event_end_time:
+          type: string
+          format: time
+        total_slots:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        is_available:
+          type: boolean
+        conducting_artist:
+          type: integer
+      required:
+      - conducting_artist
+      - event_date
+      - event_end_time
+      - event_name
+      - event_place
+      - event_start_time
+      - id
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          maxLength: 128
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        username:
+          type: string
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 50
+        phone_number:
+          type: string
+          maxLength: 50
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_admin:
+          type: boolean
+        is_active:
+          type: boolean
+        is_superuser:
+          type: boolean
+        is_blocked:
+          type: boolean
+      required:
+      - created_at
+      - email
+      - first_name
+      - id
+      - last_name
+      - password
+      - phone_number
+      - updated_at
+      - username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
