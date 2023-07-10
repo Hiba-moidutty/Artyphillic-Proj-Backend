@@ -9,6 +9,7 @@ class Artist(models.Model):
     artistname = models.CharField(max_length=15,unique=True)
     password = models.CharField(max_length=100)
     email = models.CharField(max_length=30,unique=True)
+    cover_img = models.ImageField(upload_to='profiles', null=True)
     profile_img = models.ImageField(upload_to='profiles', null=True)
     phone_number = models.CharField(max_length=13)
     place = models.CharField(max_length=100)

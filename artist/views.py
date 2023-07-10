@@ -1,3 +1,4 @@
+import cloudinary.uploader 
 from rest_framework.response import Response
 from rest_framework import exceptions
 from rest_framework.views import APIView
@@ -6,7 +7,6 @@ from rest_framework import status
 from accounts.models import Address
 from artist.serializers import artistSerializer, eventSerializer, postSerializer
 from drf_spectacular.utils import extend_schema
-import cloudinary.uploader 
 from django.contrib.auth import authenticate
 from userapp.models import Booking, Order
 from userapp.serializers import addressSerializer, bookingSerializer, orderSerializer, paymentSerializer
@@ -37,6 +37,11 @@ class artistSignUp(APIView):
             elif a.phone_number == phone_number:
                 return Response({'status': 'Phone Number already Exist'})
         password=encode_password(data['password'])
+        cover_image = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+        upload_result = cloudinary.uploader.upload(
+                    cover_image,
+                    folder='profiles'
+                )
         profile_image = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
         upload_result = cloudinary.uploader.upload(
                     profile_image,
@@ -47,7 +52,8 @@ class artistSignUp(APIView):
             full_name=full_name,artistname=artistname,
             email=email,password=password,
             phone_number=phone_number,
-             profile_img=profile_image
+            profile_img=profile_image,
+            cover_img=cover_image
         )
         artist.save()
         serializer = artistSerializer(artist,many=False)
@@ -81,6 +87,7 @@ def artist_Login(request):
                 'role':'artist'
                 }
     return Response(data=data, status=status.HTTP_200_OK)
+
 
 
 @extend_schema(responses=artistSerializer)
@@ -135,7 +142,7 @@ def google_artistLogin(request):
             
 
 
-@extend_schema(responses=artistSerializer(many=True))
+@extend_schema(responses=artistSerializer(many=False))
 @api_view(['GET'])
 def artist_profile(request,id):
     try:
@@ -179,6 +186,26 @@ def addProfilePic(request, artist_id):
         artist.profile_img = profile_picture_url
         artist.save()
         return Response({"profile_picture_url": profile_picture_url})
+    else:
+        return Response({"message": "Unsuccessful"})
+    
+
+
+@api_view(['POST'])
+def addCoverPic(request, artist_id):
+    artist = Artist.objects.get(id=artist_id)   # Assuming the artist is authenticated
+    cover_picture = request.FILES["profile_img"]
+    if cover_picture:
+        upload_result = cloudinary.uploader.upload(
+            cover_picture,
+            folder='profiles'
+        )
+        print(upload_result, 'lllllllllllllll')
+        cover_picture_url = upload_result['secure_url']
+       # Update the profile_img field with the image URL
+        artist.cover_img = cover_picture_url
+        artist.save()
+        return Response({"profile_picture_url": cover_picture_url})
     else:
         return Response({"message": "Unsuccessful"})
 
@@ -326,20 +353,54 @@ def delete_event(request,id):
     return Response(response,status=status.HTTP_200_OK)
 
 
+# @extend_schema(responses=bookingSerializer)
+# @api_view(['PATCH'])
+# def book_event(request):
+#     booking_serializer = bookingSerializer(data=request.data, partial=True)
+#     if booking_serializer.is_valid():
+#         booking_serializer.save()
+#         return Response({'status': 'Event booked successfully'}, status=status.HTTP_201_CREATED)
+#     return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 @extend_schema(responses=bookingSerializer)
 @api_view(['PATCH'])
 def book_event(request):
     booking_serializer = bookingSerializer(data=request.data, partial=True)
     if booking_serializer.is_valid():
+        booking_data = booking_serializer.validated_data
+        event_id = booking_data['eventname'].id
+        slot_no = booking_data['slot_no']
+        # Get the event
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Check if the total_slots is already zero
+        if event.total_slots == 0:
+            return Response({'error': 'No available slots'}, status=status.HTTP_400_BAD_REQUEST)
+        # Calculate the new total_slots value
+        new_total_slots = event.total_slots - slot_no
+        if new_total_slots < 0:
+            new_total_slots = 0
+        # Update the event's total_slots
+        event.total_slots = new_total_slots
+        event.save()
+        # Save the booking
         booking_serializer.save()
         return Response({'status': 'Event booked successfully'}, status=status.HTTP_201_CREATED)
-    print(booking_serializer.errors,'boooooking errroooorrrsss')
     return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
-def bookedevent_userlist(request,artist_id):
-    booked_list = Booking.objects.filter(artist_id=id)
+def bookedevent_userlist(request,id):
+    booked_list = Booking.objects.filter(username=id)
+    serializer = bookingSerializer(booked_list,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def bookedevent_artistlist(request,id):
+    booked_list = Booking.objects.filter(bookingartist=id)
     serializer = bookingSerializer(booked_list,many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
 
@@ -373,10 +434,18 @@ def order_post(request):
     return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(responses=addressSerializer)
+@extend_schema(responses=orderSerializer)
 @api_view(['GET'])
 def get_orders(request,artist_id):
     orders = Order.objects.filter(art_seller=artist_id)
+    serializer = orderSerializer(orders,many=True)
+    return Response({'data':serializer.data},status=status.HTTP_200_OK)
+
+
+@extend_schema(responses=orderSerializer)
+@api_view(['GET'])
+def view_artistorders(request,artist_id):
+    orders = Order.objects.filter(artist_buyer=artist_id)
     serializer = orderSerializer(orders,many=True)
     return Response({'data':serializer.data},status=status.HTTP_200_OK)
 
@@ -393,19 +462,19 @@ def editorder_status(request,order_id):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PATCH'])
-def order_cancel(request,order_id):
-    try:
-        order = Order.objects.get(id='order_id')
-        if order.order_status != 'Cancelled' :
-            order.order_status = 'Cancelled'
-            order.save()
-            serializer = orderSerializer(order,many=False)
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        else:
-            return Response('Order is already cancelled',status=status.HTTP_400_BAD_REQUEST)
-    except Order.DoesNotExist:
-        return Response('Order not found',status=status.HTTP_404_NOT_FOUND)
+# @api_view(['PATCH'])
+# def order_cancel(request,order_id):
+#     try:
+#         order = Order.objects.get(id='order_id')
+#         if order.order_status != 'Cancelled' :
+#             order.order_status = 'Cancelled'
+#             order.save()
+#             serializer = orderSerializer(order,many=False)
+#             return Response(serializer.data,status=status.HTTP_200_OK)
+#         else:
+#             return Response('Order is already cancelled',status=status.HTTP_400_BAD_REQUEST)
+#     except Order.DoesNotExist:
+#         return Response('Order not found',status=status.HTTP_404_NOT_FOUND)
     
 
 @api_view(['GET'])

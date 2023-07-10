@@ -21,7 +21,8 @@ class Order(models.Model):
 
 class Booking(models.Model):
     username = models.ForeignKey(Accounts,on_delete=models.CASCADE,null=True)
-    artistname = models.ForeignKey(Artist,on_delete=models.CASCADE,null=True)
+    artist_name = models.ForeignKey(Artist,on_delete=models.CASCADE,related_name='artist_name',null=True)
+    bookingartist = models.ForeignKey(Artist,on_delete=models.CASCADE,related_name='bookingartist',null=True)
     eventname = models.ForeignKey(Event,on_delete=models.CASCADE)
     booking_date = models.DateTimeField(auto_now_add=True,null=True)
     slot_no = models.IntegerField(null=True)

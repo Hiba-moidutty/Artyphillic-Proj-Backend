@@ -49,6 +49,8 @@ class Accounts(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50,unique=True)
     email = models.EmailField(max_length=50,unique=True)
+    cover_img = models.ImageField(upload_to='profiles', null=True)
+    profile_img = models.ImageField(upload_to='profiles', null=True)
     phone_number = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True,null=True)
     updated_at = models.DateTimeField(auto_now_add=True,null=True)
