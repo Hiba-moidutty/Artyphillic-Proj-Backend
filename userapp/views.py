@@ -1,4 +1,5 @@
 import jwt
+import cloudinary.uploader 
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -26,12 +27,55 @@ def verify_token(request):
         return Response({'status': 'Token Invalid'})  
 
 
-@extend_schema(responses=userSerializer)
+@extend_schema(responses=userSerializer(many=False))
 @api_view(['GET'])
 def user_profile(request,id):
-    artist = Accounts.objects.filter(id=id)
-    serializer = userSerializer(artist,many=True)
-    return Response(serializer.data)
+    try:
+        user = Accounts.objects.get(id=id)
+        serializer = userSerializer(user,many=False)
+        user_details = serializer.data
+        return Response({'data':user_details}, status=status.HTTP_200_OK)
+    except Accounts.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def userProfilePic(request, user_id):
+    user = Accounts.objects.get(id=user_id)   # Assuming the artist is authenticated
+    profile_picture = request.FILES["profile_img"]
+    if profile_picture:
+        upload_result = cloudinary.uploader.upload(
+            profile_picture,
+            folder='profiles'
+        )
+        print(upload_result, 'lllllllllllllll')
+        profile_picture_url = upload_result['secure_url']
+       # Update the profile_img field with the image URL
+        user.profile_img = profile_picture_url
+        user.save()
+        return Response({"profile_picture_url": profile_picture_url})
+    else:
+        return Response({"message": "Unsuccessful"})
+
+
+@api_view(['POST'])
+def userCoverPic(request, user_id):
+    user = Accounts.objects.get(id=user_id)   # Assuming the artist is authenticated
+    cover_picture = request.FILES["cover_img"]
+    if cover_picture:
+        upload_result = cloudinary.uploader.upload(
+            cover_picture,
+            folder='profiles'
+        )
+        print(upload_result, 'lllllllllllllll')
+        cover_picture_url = upload_result['secure_url']
+       # Update the cover_img field with the image URL
+        user.cover_img = cover_picture_url
+        user.save()
+        return Response({"profile_picture_url": cover_picture_url})
+    else:
+        return Response({"message": "Unsuccessful"})
+    
 
 
 @extend_schema(responses=userSerializer)
@@ -69,8 +113,8 @@ def booking_event(request):
 
 @extend_schema(responses=bookingSerializer)
 @api_view(['GET'])
-def bookedevent_list(request,user_id):
-    booked_list = Booking.objects.filter(user_id=id)
+def bookedevent_list(request,id):
+    booked_list = Booking.objects.filter(username=id)
     serializer = bookingSerializer(booked_list,many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
     

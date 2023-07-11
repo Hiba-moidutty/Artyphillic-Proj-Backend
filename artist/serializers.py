@@ -19,8 +19,6 @@ class postSerializer(serializers.ModelSerializer):
     artist_name = serializers.CharField(source='artist.artistname', read_only= True)
     artist_id = serializers.CharField(source='artist.id', read_only= True)
     artist_profileimg = serializers.ImageField(source='artist.profile_img', read_only= True)
-    # artist_id = serializers.CharField(required=False)
-    # artist_name = serializers.CharField(required=False)
     
     class Meta:
         model=Post
