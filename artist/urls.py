@@ -11,6 +11,7 @@ urlpatterns = [
     path('profile_update/<int:id>',views.artist_profile_update,name='profile_update'),
     path('addartistaddress/',views.add_artistaddress,name='addartistaddress'),
     path('getartistaddress/<int:artistid>',views.get_address,name='getartistaddress'),
+    path('deleteaddress/<int:id>',views.delete_address,name='deleteaddress'),
 
     path('artistpostlist/<int:artist_id>',views.artistpost_list,name='artistpostlist'),
     path('artisteventlist/<int:artist_id>',views.artistevent_list,name='artisteventlist'),

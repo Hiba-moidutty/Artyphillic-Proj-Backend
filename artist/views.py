@@ -423,6 +423,14 @@ def get_address(request,artistid):
     return Response({'data':serializer.data},status=status.HTTP_200_OK)
 
 
+@extend_schema(responses=addressSerializer)
+@api_view(['DELETE'])
+def delete_address(request,id):
+    address= Address.objects.get(id=id)
+    address.delete()
+    return Response("Post deleted")
+
+
 @extend_schema(responses=bookingSerializer)
 @api_view(['PATCH'])
 def order_post(request):
