@@ -15,10 +15,9 @@ urlpatterns = [
     path('booking_event/',views.booking_event,name='booking_event'),
     path('userbookedevents/<int:id>',views.bookedevent_list,name='userbookedevents'),
 
-    path('orderlist/',views.order_list,name='orderlist'),
-    path('ordercancel/',views.ordercancel,name='ordercancel'),
+    path('userorderlist/<int:user_id>',views.order_list,name='userorderlist'),
     path('artistpostlist/',views.artists_postlist,name='artistpostlist'),
     # path('buypost/',views.buy_post,name='buypost'),
-    path('checkout/',views.checkout,name='checkout'),
+    # path('checkout/',views.checkout,name='checkout'),
     
 ]

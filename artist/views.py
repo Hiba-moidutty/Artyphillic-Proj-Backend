@@ -491,4 +491,4 @@ def editorder_status(request,order_id):
 def order_details(request):
     orders = Order.objects.all()
     serializer = orderSerializer(orders,many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    return Response({'data':serializer.data},status=status.HTTP_200_OK)

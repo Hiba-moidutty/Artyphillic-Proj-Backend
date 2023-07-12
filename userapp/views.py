@@ -194,31 +194,11 @@ def delete_address(request,id):
 
 
 @extend_schema(responses=orderSerializer)
-@api_view(['POST'])
-def checkout(request):
-    serializer = orderSerializer(data=request.data)
-    if serializer.is_valid():
-        order = serializer.save()
-        return Response('Order placed successfully',status=status.HTTP_201_CREATED)
-    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-@extend_schema(responses=orderSerializer)
 @api_view(['GET'])
-def order_list(request,order_id):
-    order_list = Order.objects.filter(id=order_id)
+def order_list(request,user_id):
+    order_list = Order.objects.filter(user_buyer=user_id)
     serializer = orderSerializer(order_list,many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    return Response({'data':serializer.data},status=status.HTTP_200_OK)
     
 
-@api_view(['PATCH'])
-def ordercancel(request,id):
-    order = Order.objects.get(id=id)
-    if order.status != 'Cancelled':
-        order.order_status = 'Cancelled'
-        order.save()
-        serializer = orderSerializer(order,many=False)
-        return Response(serializer.data,status.HTTP_200_OK)
-    else:
-        return Response('Order is already cancelled',status=status.HTTP_400_BAD_REQUEST)
      

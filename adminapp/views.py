@@ -33,7 +33,11 @@ class adminLogin(APIView):
                         }
                         jwt_token = jwt.encode({'payload':payload},'secret',algorithm='HS256')
                         response = Response(
-                        {'status': 'Success','payload':payload,'jwt':jwt_token,'role':'admin'})
+                        {'status': 'Success',
+                         'payload':payload,
+                         'email':admin.email,
+                         'jwt':jwt_token,
+                         'role':'admin'})
                         return response
                     else:
                         status = 'Wrong Password'
@@ -43,36 +47,6 @@ class adminLogin(APIView):
         except:
             if Accounts.DoesNotExist:
                 return Response("Email or Password is Wrong")
-
-
-# class adminLogin(APIView):
-#     @extend_schema(responses=userSerializer,request=userSerializer)
-#     def post(self,request):
-#         serializer = userSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         email = serializer.validated_data['email']
-#         password = serializer.validated_data['password']
-
-#         try:
-#             admin = Accounts.objects.get(email=email)
-#             if admin.is_superuser and admin.email == email and check_password(password,admin.password):
-#                 payload = {
-#                     'email' : email,
-#                     'password' : password
-#                 }
-#                 jwt_token = jwt.encode({'payload' : payload}, 'secret' , algorithm='HS256')
-#                 response = {
-#                     'status' : 'Success',
-#                     'payload' : payload,
-#                     'jwt' : jwt_token,
-#                     'role' : 'admin'
-#                 }
-#                 return Response(response)
-#             else:
-#                 return Response({'status' : 'Invalid credentials'})
-#         except:
-#             if Accounts.DoesNotExist:
-#                 return Response({'status' : "Email or Password is Wrong"})
 
 
 
@@ -181,7 +155,7 @@ def delete_post(request,id):
 def order_list(request):
     orders = Order.objects.all()
     serializer = orderSerializer(orders,many=True)
-    return Response(serializer.data)
+    return Response({'data':serializer.data},status=status.HTTP_200_OK)
 
 
 @api_view(['PATCH'])
