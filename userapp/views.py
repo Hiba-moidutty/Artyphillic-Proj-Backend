@@ -82,8 +82,8 @@ def userCoverPic(request, user_id):
 @api_view(['PUT'])
 def user_profile_update(request,id):
     try:
-        artist = Accounts.objects.get(id=id)
-        serializer = userSerializer(artist,data=request.data)
+        user = Accounts.objects.get(id=id)
+        serializer = userSerializer(user,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response("Profile updated Successfully")
@@ -149,22 +149,22 @@ def artists_postlist(request,artist_id):
 
 
 # @extend_schema(responses=postSerializer)
-@api_view(['GET'])
-def buy_post(request,post_id):
-    try:
-        address = Address.objects.get(user=request.user)
-        post = Post.objects.get(id=post_id)
-        base_price = post.base_price
-        shipping_price = post.shipping_price
-        total_price = base_price + shipping_price
-        data = {
-            'post':post.id,'base_price':base_price,
-            'shipping_price':shipping_price,'total_price':total_price,
-            'address':address
-            } 
-        return Response(data, status=status.HTTP_201_CREATED)
-    except Post.DoesNotExist:
-        return Response({'status':'Post not found'},status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['GET'])
+# def buy_post(request,post_id):
+#     try:
+#         address = Address.objects.get(user=request.user)
+#         post = Post.objects.get(id=post_id)
+#         base_price = post.base_price
+#         shipping_price = post.shipping_price
+#         total_price = base_price + shipping_price
+#         data = {
+#             'post':post.id,'base_price':base_price,
+#             'shipping_price':shipping_price,'total_price':total_price,
+#             'address':address
+#             } 
+#         return Response(data, status=status.HTTP_201_CREATED)
+#     except Post.DoesNotExist:
+#         return Response({'status':'Post not found'},status=status.HTTP_400_BAD_REQUEST)
     
 
 @extend_schema(responses=addressSerializer)
@@ -179,10 +179,10 @@ def add_address(request):
 
 @extend_schema(responses=addressSerializer)
 @api_view(['GET'])
-def address_details(request):
-    adresses = Address.objects.filter(user=request.user)
+def address_details(request,userid):
+    adresses = Address.objects.filter(user_id=userid)
     serializer = addressSerializer(adresses,many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    return Response({'data':serializer.data},status=status.HTTP_200_OK)
 
 
 @extend_schema(responses=addressSerializer)

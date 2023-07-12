@@ -439,7 +439,7 @@ def order_post(request):
     order_serializer = orderSerializer(data=request.data, partial=True)
     if order_serializer.is_valid():
         order_serializer.save()
-        return Response({'status': 'Event booked successfully'}, status=status.HTTP_201_CREATED)
+        return Response({'status': 'ordered successfully'}, status=status.HTTP_201_CREATED)
     print(order_serializer.errors,'boooooking errroooorrrsss')
     return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
