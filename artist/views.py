@@ -194,7 +194,7 @@ def addProfilePic(request, artist_id):
 @api_view(['POST'])
 def addCoverPic(request, artist_id):
     artist = Artist.objects.get(id=artist_id)   # Assuming the artist is authenticated
-    cover_picture = request.FILES["profile_img"]
+    cover_picture = request.FILES["cover_img"]
     if cover_picture:
         upload_result = cloudinary.uploader.upload(
             cover_picture,
@@ -205,7 +205,7 @@ def addCoverPic(request, artist_id):
        # Update the profile_img field with the image URL
         artist.cover_img = cover_picture_url
         artist.save()
-        return Response({"profile_picture_url": cover_picture_url})
+        return Response({"cover _picture_url": cover_picture_url})
     else:
         return Response({"message": "Unsuccessful"})
 
@@ -361,6 +361,8 @@ def delete_event(request,id):
 #         booking_serializer.save()
 #         return Response({'status': 'Event booked successfully'}, status=status.HTTP_201_CREATED)
 #     return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @extend_schema(responses=bookingSerializer)
 @api_view(['PATCH'])

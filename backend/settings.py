@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'cloudinary',
-    ''
 ]
 
 MIDDLEWARE = [

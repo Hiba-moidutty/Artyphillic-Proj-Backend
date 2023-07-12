@@ -102,10 +102,29 @@ def event_details(request,id):
 
 
 @extend_schema(responses=bookingSerializer)
-@api_view(['POST'])
+@api_view(['PATCH'])
 def booking_event(request):
     booking_serializer = bookingSerializer(data=request.data)
     if booking_serializer.is_valid() :
+        booking_data = booking_serializer.validated_data
+        event_id = booking_data['eventname'].id
+        slot_no = booking_data['slot_no']
+        # Get the event
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Check if the total_slots is already zero
+        if event.total_slots == 0:
+            return Response({'error': 'No available slots'}, status=status.HTTP_400_BAD_REQUEST)
+        # Calculate the new total_slots value
+        new_total_slots = event.total_slots - slot_no
+        if new_total_slots < 0:
+            new_total_slots = 0
+        # Update the event's total_slots
+        event.total_slots = new_total_slots
+        event.save()
+        # Save the booking
         booking_serializer.save()
         return Response({'status': 'Event booked successfully'}, status=status.HTTP_201_CREATED)
     return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
