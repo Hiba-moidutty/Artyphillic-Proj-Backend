@@ -76,6 +76,7 @@ def userLogin(request):
         jwt_token = create_jwt_token_user(user.id)
         data = {
             'id': user.id,
+            'name':user.username,
             'email': user.email,
             'password': user.password,
             'token': jwt_token,
