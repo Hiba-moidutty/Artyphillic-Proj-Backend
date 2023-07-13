@@ -72,7 +72,7 @@ def userCoverPic(request, user_id):
        # Update the cover_img field with the image URL
         user.cover_img = cover_picture_url
         user.save()
-        return Response({"profile_picture_url": cover_picture_url})
+        return Response({"cover_picture_url": cover_picture_url})
     else:
         return Response({"message": "Unsuccessful"})
     

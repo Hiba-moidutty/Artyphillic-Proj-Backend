@@ -205,7 +205,7 @@ def addCoverPic(request, artist_id):
        # Update the profile_img field with the image URL
         artist.cover_img = cover_picture_url
         artist.save()
-        return Response({"cover _picture_url": cover_picture_url})
+        return Response({"cover_picture_url": cover_picture_url})
     else:
         return Response({"message": "Unsuccessful"})
 
